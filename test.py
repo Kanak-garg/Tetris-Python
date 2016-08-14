@@ -1,3 +1,9 @@
+import random
+import os
+import time
+
+game = [[0 for i in range(34)] for j in range(32)]
+
 class Gameplay:
 
 	def __init__(self, height, width):
@@ -6,7 +12,6 @@ class Gameplay:
 
 	def createbox(self):
 
-		game = [[0 for i in range(self.width+2)] for j in range(self.height+2)]
 		for i in range(self.height+2):
 			for j in range(self.width+2):
 
@@ -28,17 +33,75 @@ class Gameplay:
 				else:
 					game[i][j] = ' '
 
-		return game	
+	
 
-	def printbox(self, game):
-		for i in game:
-			for j in i:
-				print j,
-			print		
+class Block:
 
+	def __init__(self):
+		self.block = ['X', 'X', 'X', 'X']
+		
+
+	def assignPosition(self):
+
+		index = random.randrange(1, 30) #random number between 1 to 29
+		remIndex = index;
+		if ''.join(self.block) == 'XXXX':
+			for i in self.block:
+				game[1][index] = i;
+				index +=1
+		return remIndex;
+
+	def deassignPosition(self, remIndex):
+		if ''.join(self.block) == 'XXXX':
+			for i in self.block:
+				game[1][remIndex] = ' '
+				remIndex += 1
+
+
+	def move1Unit(self, remIndex):
+		if ''.join(self.block) == 'XXXX':
+			for i in self.block:
+				game[2][remIndex] = i
+				remIndex += 1
+
+
+
+
+def printbox():
+	for i in game:
+		for j in i:
+			print j,
+		print
 
 
 Tetris = Gameplay(30, 32);
-game = Tetris.createbox()
-Tetris.printbox(game)
+brick = Block();
+
+Tetris.createbox()
+printbox()
+
+print '\n\n\n'
+
+time.sleep(1)
+os.system('clear')
+
+remIndex = brick.assignPosition()
+printbox()
+
+print '\n\n\n'
+
+
+
+brick.deassignPosition(remIndex)
+
+
+time.sleep(1)
+os.system('clear')
+
+brick.move1Unit(remIndex)
+printbox()
+
+print '\n\n\n'
+
+
 
