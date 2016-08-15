@@ -83,8 +83,10 @@ class Gameplay:
 		self.deassignPosition(index, block, line-1)
 		if(self.checkNextPosition(block, line, index)):
 			self.assignPosition(block, line, index)
+			return 'target moved'
 		else:
 			self.assignPosition(block, line-1, index)
+			return 'target blocked'
 
 
 class Board(Gameplay):
@@ -96,7 +98,10 @@ class Board(Gameplay):
 	def checkNextPosition(self, block, line, index):
 		remIndex = index
 
-		if len(block) == 4:
+		if line == 30:
+			return False
+
+		elif len(block) == 4:
 			for i in block:
 				if game[line][index] == 'X':
 					return False
@@ -133,43 +138,46 @@ def printbox():
 Tetris = Structure(30, 32);
 brick = Board();
 Tetris.createbox()
-for i in range(1, 33):
-	game[4][i] = 'X'
+# for i in range(1, 33):
+# 	game[12][i] = 'X'
 
 os.system('clear')
 
-
-block = brick.pickRandomBlock()
-index = random.randrange(1, 30)
-
-
-if(brick.checkNextPosition(block, 1, index)):
-	brick.assignPosition(block, 1, index)
-	printbox()
+while True:
+	block = brick.pickRandomBlock()
+	index = random.randrange(1, 30)
 
 
-
-# brick.deassignPosition(index, block, 1)
-
-
-# time.sleep(1)
-# os.system('clear')
+	if(brick.checkNextPosition(block, 1, index)):
+		brick.assignPosition(block, 1, index)
+		printbox()
 
 
-brick.move1Unit(index, block, 2)
-printbox()
 
 
-# time.sleep(1)
-# os.system('clear')
-# brick.deassignPosition(index, block, 2)
+	s=2
+	blockStatus = 'target moved'
+	while True:
+		time.sleep(.01)
+		os.system('clear')
+		if blockStatus == 'target moved':
+			blockStatus = brick.move1Unit(index, block, s)
+			printbox()
+			s+=1
+		else:
+			break
 
 
-brick.move1Unit(index, block, 3)
-printbox()
+	# time.sleep(1)
+	# os.system('clear')
+	# brick.deassignPosition(index, block, 2)
 
-brick.move1Unit(index, block, 4)
-printbox()
+
+	# brick.move1Unit(index, block, 3)
+	# printbox()
+
+	# brick.move1Unit(index, block, 4)
+	# printbox()
 
 print '\n\n\n'
 
