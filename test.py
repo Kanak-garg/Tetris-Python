@@ -4,7 +4,7 @@ import time
 
 game = [[0 for i in range(34)] for j in range(32)]
 
-class Gameplay:
+class Structure:
 
 	def __init__(self, height, width):
 		self.height = height;
@@ -33,23 +33,22 @@ class Gameplay:
 				else:
 					game[i][j] = ' '
 
+
 	
 
-class Block:
+class Gameplay:
 
 	def __init__(self):
-		self.block = [['X', 'X', 'X', 'X'], [['X', 'X'], ['X', 'X']], [['X', 'X'], [' ', 'X', 'X']], [[' ', 'X', 'X'], ['X', 'X']], [[' ', 'X'], ['X', 'X', 'X']], 
+		self.blocks = [['X', 'X', 'X', 'X'], [['X', 'X'], ['X', 'X']], [['X', 'X'], [' ', 'X', 'X']], [[' ', 'X', 'X'], ['X', 'X']], [[' ', 'X'], ['X', 'X', 'X']], 
 						[['X', 'X', 'X'], [' ', ' ', 'X']]]
 
 	def pickRandomBlock(self):
-		return self.block[random.randrange(0,6)] #return array of between index of 0 to 5
+		return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
 
 
 	def assignPosition(self, block, line, index):
 
 		remIndex = index;
-
-		#line=1
 		if len(block) == 4: #1D - Array
 			for i in block:
 				game[line][index] = i;
@@ -63,36 +62,61 @@ class Block:
 				line += 1
 				index = remIndex
 
-		return remIndex;
 
-	def deassignPosition(self, remIndex, block, line):
-		line=1
-		remRemIndex = remIndex
+	def deassignPosition(self, index, block, line):
+		remIndex = index
 		if len(block) == 4:
 			for i in block:
-				game[line][remIndex] = ' '
-				remIndex += 1
+				game[line][index] = ' '
+				index += 1
 		else:
 			for i in block:
 				for j in i:
-					game[line][remIndex] = ' '
-					remIndex += 1
+					game[line][index] = ' '
+					index += 1
 				line += 1
-				remIndex = remRemIndex
+				index = remIndex
 
 
 
-	def move1Unit(self, remIndex, block, line):
-		
-		# remRemIndex = remIndex
+	def move1Unit(self, index, block, line):
+		self.deassignPosition(index, block, line-1)
+		if(self.checkNextPosition(block, line, index)):
+			self.assignPosition(block, line, index)
+		else:
+			self.assignPosition(block, line-1, index)
 
-		# if len(block) == 4:
-		# 	for i in block:
-		# 		game[line][remIndex] = i
-		# 		remIndex += 1
-		# else:
 
-		self.assignPosition(block, line, remIndex)
+class Board(Gameplay):
+
+	def __init__(self):
+		Gameplay.__init__(self)
+
+
+	def checkNextPosition(self, block, line, index):
+		remIndex = index
+
+		if len(block) == 4:
+			for i in block:
+				if game[line][index] == 'X':
+					return False
+				else:
+					index += 1
+			return True		
+
+		else:	
+			for i in block:
+				for j in i:
+					if game[line][index] == 'X':
+						return False
+					else:
+						index += 1
+
+				line += 1
+				index = remIndex
+
+			return True
+
 
 
 
@@ -104,32 +128,47 @@ def printbox():
 		print
 
 
-Tetris = Gameplay(30, 32);
-brick = Block();
 
+
+Tetris = Structure(30, 32);
+brick = Board();
 Tetris.createbox()
-printbox()
+for i in range(1, 33):
+	game[4][i] = 'X'
 
-print '\n\n\n'
-
-time.sleep(1)
 os.system('clear')
+
 
 block = brick.pickRandomBlock()
-remIndex = brick.assignPosition(block, 1, random.randrange(1, 30))
+index = random.randrange(1, 30)
+
+
+if(brick.checkNextPosition(block, 1, index)):
+	brick.assignPosition(block, 1, index)
+	printbox()
+
+
+
+# brick.deassignPosition(index, block, 1)
+
+
+# time.sleep(1)
+# os.system('clear')
+
+
+brick.move1Unit(index, block, 2)
 printbox()
 
-print '\n\n\n'
+
+# time.sleep(1)
+# os.system('clear')
+# brick.deassignPosition(index, block, 2)
 
 
+brick.move1Unit(index, block, 3)
+printbox()
 
-brick.deassignPosition(remIndex, block, 1)
-#printbox()
-
-time.sleep(1)
-os.system('clear')
-
-brick.move1Unit(remIndex, block, 2)
+brick.move1Unit(index, block, 4)
 printbox()
 
 print '\n\n\n'
