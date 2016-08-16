@@ -44,7 +44,7 @@ class Gameplay:
 
 	def pickRandomBlock(self):
 		return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
-
+		#return self.blocks[5]
 
 	def assignPosition(self, block, line, index):
 
@@ -57,7 +57,8 @@ class Gameplay:
 		else: # 2-D Array
 			for i in block:
 				for j in i:
-					game[line][index] = j
+					if game[line][index] != 'X':
+						game[line][index] = j
 					index += 1
 				line += 1
 				index = remIndex
@@ -72,7 +73,8 @@ class Gameplay:
 		else:
 			for i in block:
 				for j in i:
-					game[line][index] = ' '
+					if j == 'X':
+						game[line][index] = ' '
 					index += 1
 				line += 1
 				index = remIndex
@@ -98,7 +100,10 @@ class Board(Gameplay):
 	def checkNextPosition(self, block, line, index):
 		remIndex = index
 
-		if line == 30:
+		if line == 30 and len(block) != 4:
+			return False
+
+		elif line == 31 and len(block) == 4:
 			return False
 
 		elif len(block) == 4:
@@ -112,7 +117,7 @@ class Board(Gameplay):
 		else:	
 			for i in block:
 				for j in i:
-					if game[line][index] == 'X':
+					if game[line][index] == 'X' and j == 'X':
 						return False
 					else:
 						index += 1
@@ -158,7 +163,7 @@ while True:
 	s=2
 	blockStatus = 'target moved'
 	while True:
-		time.sleep(.01)
+		time.sleep(.03)
 		os.system('clear')
 		if blockStatus == 'target moved':
 			blockStatus = brick.move1Unit(index, block, s)
