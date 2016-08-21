@@ -1,6 +1,7 @@
 import random
 import os
 import time
+import pygame
 
 game = [[0 for i in range(34)] for j in range(32)]
 
@@ -43,8 +44,8 @@ class Gameplay:
 						[['X', 'X', 'X'], [' ', ' ', 'X']]]
 
 	def pickRandomBlock(self):
-		return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
-		#return self.blocks[5]
+		#return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
+		return self.blocks[0]
 
 	def assignPosition(self, block, line, index):
 
@@ -85,9 +86,11 @@ class Gameplay:
 		self.deassignPosition(index, block, line-1)
 		if(self.checkNextPosition(block, line, index)):
 			self.assignPosition(block, line, index)
+			#print "block moved"
 			return 'target moved'
 		else:
 			self.assignPosition(block, line-1, index)
+			#print "block not moved"
 			return 'target blocked'
 
 
@@ -127,6 +130,55 @@ class Board(Gameplay):
 
 			return True
 
+	def checkRowFull(self):
+		for i in range(1, 33):
+			if game[30][i] == ' ':
+				return False
+		
+		return True
+
+	def ClearRow(self):
+		if self.checkRowFull():
+			#print "clear roew onnnnnnnnnnnnnnnn!!!!!!!!!!!!!!"
+			for i in range(30, 0, -1):
+				if i != 1:
+					for j in range(1, 33):
+						game[i][j] = game[i-1][j]
+
+				else:
+					for j in range(1, 33):
+						game[1][j] = ' '
+
+			if self.checkRowFull():
+				self.ClearRow()			
+
+
+class Block(Board):
+
+	def __init__(self):
+		Board.__init__(self)
+
+	def moveright(self, block, line, index):
+
+		self.deassignPosition(index, block, line)
+		if(self.checkNextPosition(block, line, index+1)):
+			self.assignPosition(block, line, index+1)
+			return 'target moved'
+		else:
+			self.assignPosition(block, line, index)
+			return 'target blocked'
+
+	def moveleft(self, block, line, index):
+
+		self.deassignPosition(index, block, line)
+		if(self.checkNextPosition(block, line, index-1)):
+			self.assignPosition(block, line, index-1)
+			return 'target moved'
+		else:
+			self.assignPosition(block, line, index)
+			return 'target blocked'
+
+
 
 
 
@@ -141,48 +193,43 @@ def printbox():
 
 
 Tetris = Structure(30, 32);
-brick = Board();
+brick = Board()
+tile = Block()
 Tetris.createbox()
-# for i in range(1, 33):
-# 	game[12][i] = 'X'
+
+game[30][1] = 'X'
+for i in range(6, 33, 1):
+	game[30][i] = 'X'
 
 os.system('clear')
 
 while True:
 	block = brick.pickRandomBlock()
-	index = random.randrange(1, 30)
 
-
+	index = 2
 	if(brick.checkNextPosition(block, 1, index)):
 		brick.assignPosition(block, 1, index)
 		printbox()
 
 
-
-
 	s=2
 	blockStatus = 'target moved'
+
 	while True:
 		time.sleep(.03)
 		os.system('clear')
-		if blockStatus == 'target moved':
+		if blockStatus == 'target moved' and s <= 30:
 			blockStatus = brick.move1Unit(index, block, s)
+
+			brick.ClearRow()
 			printbox()
+
+		
 			s+=1
 		else:
 			break
 
 
-	# time.sleep(1)
-	# os.system('clear')
-	# brick.deassignPosition(index, block, 2)
-
-
-	# brick.move1Unit(index, block, 3)
-	# printbox()
-
-	# brick.move1Unit(index, block, 4)
-	# printbox()
 
 print '\n\n\n'
 
