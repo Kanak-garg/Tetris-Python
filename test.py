@@ -39,13 +39,14 @@ class Structure:
 
 class Gameplay:
 
-	def __init__(self):
+	def __init__(self, score):
 		self.blocks = [['X', 'X', 'X', 'X'], [['X', 'X'], ['X', 'X']], [['X', 'X'], [' ', 'X', 'X']], [[' ', 'X', 'X'], ['X', 'X']], [[' ', 'X'], ['X', 'X', 'X']], 
 						[['X', 'X', 'X'], [' ', ' ', 'X']]]
+		self.score = score
 
 	def pickRandomBlock(self):
-		#return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
-		return self.blocks[0]
+		return self.blocks[random.randrange(0,6)] #return array of between index of 0 to 5
+		#return self.blocks[0]
 
 	def assignPosition(self, block, line, index):
 
@@ -83,21 +84,41 @@ class Gameplay:
 
 
 	def move1Unit(self, index, block, line):
+		if line == 29 and len(block)==4:
+			self.updateScore(False)
+
 		self.deassignPosition(index, block, line-1)
 		if(self.checkNextPosition(block, line, index)):
 			self.assignPosition(block, line, index)
-			#print "block moved"
 			return 'target moved'
 		else:
 			self.assignPosition(block, line-1, index)
-			#print "block not moved"
+			self.updateScore(False)
 			return 'target blocked'
+
+	def checkGameover(self):
+		for i in range(1,33):
+			if game[1][i] == 'X':
+				return True
+		return False
+
+
+
+	def updateScore(self, rowClear):
+		if rowClear == False:
+			self.score += 10
+		else:
+			self.score += 100
+
+	def getScore(self):
+		return self.score
+
 
 
 class Board(Gameplay):
 
 	def __init__(self):
-		Gameplay.__init__(self)
+		Gameplay.__init__(self, 0)
 
 
 	def checkNextPosition(self, block, line, index):
@@ -139,7 +160,7 @@ class Board(Gameplay):
 
 	def ClearRow(self):
 		if self.checkRowFull():
-			#print "clear roew onnnnnnnnnnnnnnnn!!!!!!!!!!!!!!"
+
 			for i in range(30, 0, -1):
 				if i != 1:
 					for j in range(1, 33):
@@ -148,10 +169,11 @@ class Board(Gameplay):
 				else:
 					for j in range(1, 33):
 						game[1][j] = ' '
+			
+			self.updateScore(True)
 
 			if self.checkRowFull():
-				self.ClearRow()			
-
+				self.ClearRow()
 
 class Block(Board):
 
@@ -180,14 +202,13 @@ class Block(Board):
 
 
 
-
-
-
-def printbox():
+def printbox(score):
 	for i in game:
 		for j in i:
 			print j,
 		print
+	print '\n\n\n\n'		
+	print "\t\t\tScore : ", score 
 
 
 
@@ -197,37 +218,46 @@ brick = Board()
 tile = Block()
 Tetris.createbox()
 
-game[30][1] = 'X'
-for i in range(6, 33, 1):
-	game[30][i] = 'X'
+# game[30][1] = 'X'
+# for i in range(6, 33, 1):
+# 	game[30][i] = 'X'
 
 os.system('clear')
 
 while True:
 	block = brick.pickRandomBlock()
+	index = random.randrange(1, 30)
 
-	index = 2
+	gameover = 0
+
+	if brick.checkGameover():
+		gameover =1
+
 	if(brick.checkNextPosition(block, 1, index)):
 		brick.assignPosition(block, 1, index)
-		printbox()
+		printbox(brick.getScore())
 
 
-	s=2
+	itr=2
 	blockStatus = 'target moved'
 
 	while True:
-		time.sleep(.03)
+		time.sleep(0.01)
 		os.system('clear')
-		if blockStatus == 'target moved' and s <= 30:
-			blockStatus = brick.move1Unit(index, block, s)
-
+		if blockStatus == 'target moved' and itr <= 30:
+			blockStatus = brick.move1Unit(index, block, itr)
 			brick.ClearRow()
-			printbox()
+			printbox(brick.getScore())
 
-		
-			s+=1
+			itr+=1
+
 		else:
 			break
+
+	if gameover:
+		printbox
+		print '\n\n\n GAMEOVER !!!'
+		break
 
 
 
